@@ -1,0 +1,12 @@
+# A simple plug for now
+version: '3.8'
+services:
+  google_drive_checker:
+    build:
+      context: ./google_drive_checker
+  salary_report_parser:
+    build:
+      context: ./salary_report_parser
+  whats_app_bot:
+    build:
+      context: ./whats_app_bot
