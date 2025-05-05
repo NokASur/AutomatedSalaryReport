@@ -1,3 +1,6 @@
+google_drive_checker/credentials.json
+google_drive_checker/token.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
