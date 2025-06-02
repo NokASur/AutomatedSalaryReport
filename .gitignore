@@ -1,5 +1,8 @@
-google_drive_checker/credentials.json
-google_drive_checker/token.json
+report_availability_checkers/google_drive_checker/credentials.json
+report_availability_checkers/google_drive_checker/token.json
+secrets.py
+build
+dist
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

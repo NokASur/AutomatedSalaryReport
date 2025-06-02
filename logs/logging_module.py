@@ -1,6 +1,5 @@
-from logging.handlers import RotatingFileHandler
-import os
 import logging
+from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +14,7 @@ def generate_handler(filename: str,
     :return: working rotating handler of decent size (10 mB)
     """
     handler = RotatingFileHandler(
-        filename=os.path.dirname(os.path.abspath(__file__)) + filename,
+        filename=filename,
         maxBytes=10 * 1024 * 1024,
         backupCount=5,
         encoding='utf-8',
@@ -25,6 +24,5 @@ def generate_handler(filename: str,
     handler.setLevel(logging_level)
     return handler
 
-
-logger.addHandler(generate_handler("/google_drive_checker_all.log", logging.DEBUG))
-logger.addHandler(generate_handler("/google_drive_checker_info.log", logging.INFO))
+# logger.addHandler(generate_handler("/google_drive_checker_all.log", logging.DEBUG))
+# logger.addHandler(generate_handler("/google_drive_checker_info.log", logging.INFO))

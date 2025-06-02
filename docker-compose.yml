@@ -3,7 +3,7 @@ version: '3.8'
 services:
   google_drive_checker:
     build:
-      context: ./google_drive_checker
+      context: report_availability_checkers/google_drive_checker
   salary_report_parser:
     build:
       context: ./salary_report_parser
