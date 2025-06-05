@@ -3,6 +3,8 @@ report_availability_checkers/google_drive_checker/token.json
 secrets.py
 build
 dist
+parsed_reports/
+unparsed_reports/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
