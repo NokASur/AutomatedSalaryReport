@@ -14,6 +14,16 @@ logger.setLevel(logging.DEBUG)
 logger.info(f"Logger enabled")
 
 
+def safe_stoi_convertion(s: str | None) -> int | None:
+    if s is None:
+        return s
+    try:
+        return int(s)
+    except (ValueError, TypeError) as e:
+        logger.error(f"Fail during stoi convertion {e} from string: {s}")
+        return None
+
+
 # A slobby amoeba
 def parse_excel_report(path: str) -> (list[Worker], str):
     path = os.path.abspath(path)
@@ -31,7 +41,7 @@ def parse_excel_report(path: str) -> (list[Worker], str):
         if row[0] is not None:
             # RE DO
             worker = Worker(
-                id=int(row[1]),
+                id=safe_stoi_convertion(row[1]) if safe_stoi_convertion(row[1]) else None,
                 name=row[2],
                 machine_type=row[3],
                 commentary=row[4],
@@ -40,11 +50,11 @@ def parse_excel_report(path: str) -> (list[Worker], str):
                 mark2=row[7],
                 run_count1=row[8],
                 run_count2=row[9],
-                hours_worked=row[10],
-                hours_worked_sum=row[11],
-                days_worked=row[12],
-                salary_for_day=row[13],
-                salary_for_month=row[14],
+                hours_worked=round(safe_stoi_convertion(row[10]), 2) if safe_stoi_convertion(row[10]) else None,
+                hours_worked_sum=round(safe_stoi_convertion(row[11]), 2) if safe_stoi_convertion(row[11]) else None,
+                days_worked=round(safe_stoi_convertion(row[12]), 2) if safe_stoi_convertion(row[12]) else None,
+                salary_for_day=round(safe_stoi_convertion(row[13]), 2) if safe_stoi_convertion(row[13]) else None,
+                salary_for_month=round(safe_stoi_convertion(row[14]), 2) if safe_stoi_convertion(row[14]) else None,
                 repair_days_count=row[15],
                 absence_reason=row[16],
             )
@@ -56,7 +66,7 @@ def parse_excel_report(path: str) -> (list[Worker], str):
 # test
 
 # workers, date = parse_excel_report("../unparsed_reports/report.xlsx")
-#logger.info(f"Printing result messages:\n")
+# logger.info(f"Printing result messages:\n")
 # for worker in workers:
 #     logger.info(f"{worker.generate_message(date)}")
 # logger.info(f"Finished printing result messages:\n")

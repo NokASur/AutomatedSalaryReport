@@ -1,10 +1,10 @@
 report_availability_checkers/google_drive_checker/credentials.json
 report_availability_checkers/google_drive_checker/token.json
-secrets.py
+config/config.py
 build
 dist
-parsed_reports/
-unparsed_reports/
+processed_reports/
+unprocessed_reports/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

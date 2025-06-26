@@ -1,3 +1,5 @@
+import random
+
 class Worker:
     def __init__(
             self,
@@ -37,16 +39,67 @@ class Worker:
         self.absence_reason = absence_reason
 
     def generate_message(self, date: str) -> str:
-        message = f"Здравствуйте, {self.name}! Держите подробную информацию по вашему рабочему дню за {date}!:\n"
-        work_flag = False
+        greetings = [
+            f"Привет, {self.name}! Вот отчёт за {date}:\n",
+            f"Здравствуйте, {self.name}! Статистика за {date}:\n",
+            f"Добрый день, {self.name}! Ваша сводка за {date}:\n",
+            f"{self.name}, приветствую! Информация за {date}:\n",
+            f"Отчёт для {self.name} за {date}:\n"
+        ]
+
+        work_type_phrases = [
+            f"Сегодня вы работали над: {self.work_type}.\n",
+            f"В этот день вашими задачами были: {self.work_type}.\n",
+            f"Вы занимались следующим: {self.work_type}.\n",
+            f"Задачи на этот день: {self.work_type}.\n",
+            f"Сегодняшняя работа включала: {self.work_type}.\n"
+        ]
+
+        daily_stats = [
+            f"Отработано часов: {self.hours_worked}. Заработок: {self.salary_for_day} руб.\n",
+            f"Сегодняшний результат: {self.hours_worked} часов = {self.salary_for_day} руб.\n",
+            f"Вы трудились {self.hours_worked} ч. и заработали {self.salary_for_day} руб.\n",
+            f"Итог дня: {self.hours_worked} ч. работы → {self.salary_for_day} руб.\n",
+            f"За день вышло {self.hours_worked} рабочих часа, сумма: {self.salary_for_day} руб.\n"
+        ]
+
+        monthly_stats = [
+            f"За месяц наработано: {self.hours_worked_sum} ч. ({self.salary_for_month} руб.)\n",
+            f"Месячная статистика: {self.hours_worked_sum} часов, доход: {self.salary_for_month} руб.\n",
+            f"Общее время за месяц: {self.hours_worked_sum} ч. Заработок: {self.salary_for_month} руб.\n",
+            f"Наработка за месяц: {self.hours_worked_sum} часов → {self.salary_for_month} руб.\n",
+            f"Итоги месяца: {self.hours_worked_sum} ч. = {self.salary_for_month} руб.\n"
+        ]
+
+        encouragements = [
+            "Отличный результат!",
+            "Так держать!",
+            "Продолжайте в том же духе!",
+            "Прекрасная работа!",
+            "Вы молодец!",
+            "Ваши усилия впечатляют!",
+            "Это продуктивный день!",
+            "Вот это эффективность!",
+            "Замечательные показатели!",
+            "Вы на верном пути!"
+        ]
+
+        message = random.choice(greetings)
+
         if self.work_type:
-            message += f"В этот день вы занимались следующей/ими задачей/ами: {self.work_type}.\n"
-        if self.hours_worked and self.hours_worked_sum:
-            message += "Вы отработали {self.hours_worked} часов и заработали {self.salary_for_day} рублей!\n"
+            message += random.choice(work_type_phrases)
+
+        work_flag = False
+
+        if self.hours_worked and self.salary_for_day:
+            message += random.choice(daily_stats)
             work_flag = True
+
         if self.days_worked and self.hours_worked_sum:
-            message += f"За последний месяц было наработано {self.hours_worked_sum} часов и заработано{self.salary_for_month} рублей.\n"
+            message += random.choice(monthly_stats)
             work_flag = True
+
         if work_flag:
-            message += f"Отличная работа!"
+            message += random.choice(encouragements)
+
         return message

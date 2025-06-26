@@ -1,12 +1,14 @@
 import paramiko
 from paramiko import SSHClient, SFTPClient
+from scp import SCPClient
 import os
 import sys
 import re
-from secrets import HOST, PORT, USERNAME, PASSWORD, REMOTE_PATH_BASE, DEBUG
+from datetime import datetime
+from config.config import HOST, PORT, USERNAME, PASSWORD, REMOTE_PATH_BASE, DEBUG
 import logging
 from logs.logging_module import logger, generate_handler
-from custom_exceptions.exceptions import SSHException, SFTPException, OSException
+from custom_exceptions.exceptions import SSHException, SFTPException, OSException, SCPException
 
 log_path = ""
 if getattr(sys, 'frozen', False):
@@ -21,7 +23,7 @@ else:
 
 os.makedirs(log_path, exist_ok=True)
 logger.addHandler(generate_handler(os.path.join(log_path, "report_sender_all.log"), logging.DEBUG))
-logger.addHandler(generate_handler(os.path.join(log_path, "report_sender_info.log"), logging.INFO))
+logger.addHandler(generate_handler(os.path.join(log_path, "report_sender_error.log"), logging.ERROR))
 logger.setLevel(logging.DEBUG)
 logger.info(f"Logger enabled")
 
@@ -42,12 +44,30 @@ def initialize_connection() -> SSHClient:
         raise SSHException(e)
 
 
-def send_file(sftp: SFTPClient, path: str, remote_path: str) -> None:
-    logger.info(f"Sending Excel file: {path}")
+def send_file_scp(ssh: SSHClient, local_path: str, remote_path: str) -> None:
+    logger.info(f"Попытка отправить файл: {local_path} → {remote_path}")
     try:
-        sftp.put(path, remote_path)
+        if not os.path.exists(local_path):
+            logger.error(f"Локальный файл не найден: {local_path}")
+            raise SCPException(f"Файл не существует: {local_path}")
+
+        remote_dir = os.path.dirname(remote_path)
+        remote_filename = os.path.basename(remote_path)
+
+        cmd = f"mkdir -p {remote_dir}"
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+
+        with SCPClient(ssh.get_transport()) as scp:
+            print(local_path)
+            print("test")
+            print(remote_path)
+
+            scp.put(local_path, remote_path)
+
+        logger.info(f"Файл успешно отправлен на сервер: {remote_path}")
     except Exception as e:
-        raise SFTPException(e)
+        logger.error(f"Ошибка при отправке файла: {str(e)}")
+        raise SCPException(e)
 
 
 def report_scanner() -> list[str]:
@@ -55,9 +75,9 @@ def report_scanner() -> list[str]:
         logger.info(f"Scanning for excel files")
         xlsx = r".*\.xlsx$"
         excel_files = []
-        for file in os.listdir():
+        for file in os.listdir(base_path):
             if re.match(xlsx, file):
-                excel_files.append(file)
+                excel_files.append(os.path.join(base_path, file))
         logger.info(f"Excel files found: {excel_files}")
         return excel_files
     except Exception as e:
@@ -73,11 +93,13 @@ if len(excel_file_names) == 1:
         ssh = initialize_connection()
         sftp = ssh.open_sftp()
         for file in excel_file_names:
-            send_file(
-                sftp,
-                file,
-                REMOTE_PATH_BASE + file
-            )
+            if os.path.exists(file):
+                print(file)
+                send_file_scp(
+                    ssh,
+                    file,
+                    REMOTE_PATH_BASE + "report"+datetime.now().strftime("%Y%m%d_%H%M%S")+".xlsx",
+                )
         logger.info(f"Excel file sent successfully")
     except SSHException as e:
         logger.error(f"{e}")

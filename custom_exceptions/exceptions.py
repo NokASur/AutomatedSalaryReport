@@ -11,3 +11,8 @@ class SFTPException(Exception):
 class OSException(Exception):
     def __init__(self, error_message):
         super().__init__(f'OSE Exception: {error_message}')
+
+
+class SCPException(Exception):
+    def __init__(self, error_message):
+        super().__init__(f'SCP Exception: {error_message}')
