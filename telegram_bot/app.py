@@ -1,6 +1,7 @@
 import redis
 import logging
 import os
+import asyncio
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 from logs.logging_module import logger, generate_handler
@@ -78,7 +79,7 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     r.hset(user_code, "State", "Activated")
     r.hset(user_code, "Chat_id", str(chat_id))
     r.hset(str(chat_id), "User_code", user_code)
-
+    r.sadd("Chat_ids", str(chat_id))
     logger.info(f"Correct code used: {user_code}")
     return CODE_CONFIRMED
 
@@ -90,10 +91,11 @@ async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAUL
         user_code = r.hget(str(chat_id), "User_code")
         await update.message.reply_text(
             f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
-            f"Если вы хотите вернуть оповещения - заново пройдите регистрацию."
+            f"Если вы хотите вернуть оповещения - заново пройдите регистрацию с помощью команды '/start'."
         )
         r.delete(str(chat_id))
         r.delete(user_code)
+        r.srem(str(chat_id))
         logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
         return AWAITING_CODE
 
@@ -113,6 +115,23 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error("Something went wrong after user message")
 
 
+async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
+    try:
+        chat_ids = r.smembers("Chat_ids")
+        for chat_id in chat_ids:
+            user_code = r.get(chat_id)
+            message = r.hget(user_code, "Message")
+            if message != "":
+                await context.bot.send_message(chat_id, message)
+                logger.info(f"Message: {message} sent to {chat_id}.")
+    except redis.RedisError as e:
+        logger.error(f"Redis error in check_redis_and_notify: {e}")
+        await asyncio.sleep(60)
+    except Exception as e:
+        logger.error(f"Unexpected error in check_redis_and_notify: {e}")
+        await asyncio.sleep(60)
+
+
 def main():
     logger.info("Started app")
     app = Application.builder().token(TELEGRAM_TOKEN).build()
@@ -127,6 +146,13 @@ def main():
     )
 
     app.add_handler(conv_handler)
+
+    job_queue = app.job_queue
+
+    job_queue.run_repeating(
+        callback=check_redis_and_notify,
+        interval=10,
+    )
 
     app.run_polling()
 
