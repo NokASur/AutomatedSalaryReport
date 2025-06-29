@@ -4,11 +4,12 @@ import os
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 from logs.logging_module import logger, generate_handler
-from config.config import TELEGRAM_TOKEN
+from config.config import TELEGRAM_TOKEN, REDIS_PASSWORD
 
 r = redis.Redis(
     host="localhost",
     port=6379,
+    password=REDIS_PASSWORD,
     db=0,
     decode_responses=True
 )
