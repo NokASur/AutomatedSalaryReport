@@ -94,14 +94,14 @@ async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAUL
     return CODE_CONFIRMED
 
 
-async def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
     if not r.exists(str(chat_id)):
-        await update.message.reply_text("Вы еще не были зарегистрированы.")
+        update.message.reply_text("Вы еще не были зарегистрированы.")
         return AWAITING_CODE
 
     user_code = r.get(str(chat_id))
-    await update.message.reply_text(
+    update.message.reply_text(
         f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
         f"Если вы хотите вернуть оповещения - заново пройдите регистрацию."
     )
