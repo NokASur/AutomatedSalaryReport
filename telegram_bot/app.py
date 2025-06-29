@@ -119,7 +119,8 @@ async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
     try:
         chat_ids = r.smembers("Chat_ids")
         for chat_id in chat_ids:
-            user_code = r.get(chat_id)
+            logger.info(f"Chat_id: {chat_id} found")
+            user_code = r.get(str(chat_id))
             message = r.hget(user_code, "Message")
             if message != "":
                 await context.bot.send_message(chat_id, message)
