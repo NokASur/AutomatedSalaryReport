@@ -77,6 +77,7 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     r.hset(user_code, "State", "Activated")
     r.hset(user_code, "Chat_id", str(chat_id))
+    r.hset(str(chat_id), "User_code", user_code)
 
     logger.info(f"Correct code used: {user_code}")
     return CODE_CONFIRMED
@@ -86,11 +87,12 @@ async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAUL
     message = update.message.text.strip().upper()
     if message == "ERASE":
         chat_id = update.message.chat_id
-        user_code = r.get(str(chat_id))
+        user_code = r.hget(str(chat_id), "User_code")
         await update.message.reply_text(
             f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
             f"Если вы хотите вернуть оповещения - заново пройдите регистрацию."
         )
+        r.delete(str(chat_id))
         r.delete(user_code)
         logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
         return AWAITING_CODE
