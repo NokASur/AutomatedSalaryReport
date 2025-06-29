@@ -3,7 +3,6 @@ from openpyxl import load_workbook
 import logging
 from logs.logging_module import logger, generate_handler
 import os
-import shutil
 
 log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 
@@ -41,7 +40,7 @@ def parse_excel_report(path: str) -> (list[Worker], str):
         if row[0] is not None:
             # RE DO
             worker = Worker(
-                id=safe_stoi_convertion(row[1]) if safe_stoi_convertion(row[1]) else None,
+                unique_id=row[1],
                 name=row[2],
                 machine_type=row[3],
                 commentary=row[4],

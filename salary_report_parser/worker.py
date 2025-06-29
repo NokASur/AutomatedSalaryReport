@@ -3,7 +3,7 @@ import random
 class Worker:
     def __init__(
             self,
-            id: int,
+            unique_id: str,
             name: str | None = None,
             machine_type: str | None = None,
             commentary: str | None = None,

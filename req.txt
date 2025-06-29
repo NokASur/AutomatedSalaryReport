@@ -1,0 +1,8 @@
+twilio
+openpyxl
+paramiko
+scp
+google_auth_oauthlib
+google_api_python_client
+python-telegram-bot
+redis
