@@ -91,8 +91,7 @@ async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAUL
             f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
             f"Если вы хотите вернуть оповещения - заново пройдите регистрацию."
         )
-        r.delete(str(chat_id))
-        r.srem(user_code, chat_id)
+        r.delete(user_code)
         logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
         return AWAITING_CODE
 
