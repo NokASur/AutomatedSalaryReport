@@ -1,21 +1,23 @@
 import redis
 import logging
 import os
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 from logs.logging_module import logger, generate_handler
-from config.config import TELEGRAM_TOKEN, REDIS_PASSWORD
+from config.config import TELEGRAM_TOKEN, REDIS_PASSWORD, REDIS_HOST, REDIS_PORT
 
 r = redis.Redis(
-    host="localhost",
-    port=6379,
+    host=REDIS_HOST,
+    port=REDIS_PORT,
     password=REDIS_PASSWORD,
     db=0,
     decode_responses=True
 )
 
 # Code for testing only
-r.sadd("85C9-176A-14CC-7ABB", "TEST")
+r.hset("85C9-176A-1000-TEST", mapping={"State": "Activated", "Message": "Test message"})
+r.hset("85C9-176A-1001-TEST", mapping={"State": "Registered", "Message": "Test message"})
+# Code for testing only
 
 (
     AWAITING_CODE,
@@ -71,15 +73,20 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"Код подтвержден.\n"
         f"Теперь сюда будут периодически приходить краткие отчеты по вашей работе.\n"
-        f"Если вы хотите отписаться от оповещений - нажмите 'erase'."
+        f"Если вы хотите отписаться от оповещений - напищите в чат 'erase'."
     )
-    r.sadd(user_code, chat_id)
-    r.setnx(str(chat_id), user_code)
+    r.hset(user_code, "State", "Activated")
+    r.hset(user_code, "Chat_id", str(chat_id))
+
     logger.info(f"Correct code used: {user_code}")
     return CODE_CONFIRMED
 
 
 async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = update.message.text.strip().upper()
+    if message == "ERASE":
+        return erase(update, context)
+
     await update.message.reply_text(
         f"На данный момент бот просто присылает информацию по мере её поступления на сервер.\n"
         f"В будущем будет возможно задавать вопросы через бота. Сейчас же предлагаю просто отдохнуть :В"

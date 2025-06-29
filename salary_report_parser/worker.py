@@ -3,7 +3,7 @@ import random
 class Worker:
     def __init__(
             self,
-            unique_id: str,
+            unique_id: str | None = None,
             name: str | None = None,
             machine_type: str | None = None,
             commentary: str | None = None,
@@ -21,7 +21,7 @@ class Worker:
             absence_reason: str | None = None,
 
     ):
-        self.id = id
+        self.unique_id = unique_id
         self.name = name
         self.machine_type = machine_type
         self.commentary = commentary
