@@ -73,8 +73,8 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Теперь сюда будут периодически приходить краткие отчеты по вашей работе.\n"
         f"Если вы хотите отписаться от оповещений - нажмите 'erase'."
     )
-    await r.sadd(user_code, chat_id)
-    await r.setnx(str(chat_id), user_code)
+    r.sadd(user_code, chat_id)
+    r.setnx(str(chat_id), user_code)
     logger.info(f"Correct code used: {user_code}")
     return CODE_CONFIRMED
 
@@ -98,8 +98,8 @@ async def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
         f"Если вы хотите вернуть оповещения - заново пройдите регистрацию."
     )
-    await r.delete(str(chat_id))
-    await r.srem(user_code, chat_id)
+    r.delete(str(chat_id))
+    r.srem(user_code, chat_id)
     logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
     return AWAITING_CODE
 
