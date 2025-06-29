@@ -85,30 +85,22 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message.text.strip().upper()
     if message == "ERASE":
-        return erase(update, context)
+        chat_id = update.message.chat_id
+        user_code = r.get(str(chat_id))
+        await update.message.reply_text(
+            f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
+            f"Если вы хотите вернуть оповещения - заново пройдите регистрацию."
+        )
+        r.delete(str(chat_id))
+        r.srem(user_code, chat_id)
+        logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
+        return AWAITING_CODE
 
     await update.message.reply_text(
         f"На данный момент бот просто присылает информацию по мере её поступления на сервер.\n"
         f"В будущем будет возможно задавать вопросы через бота. Сейчас же предлагаю просто отдохнуть :В"
     )
     return CODE_CONFIRMED
-
-
-def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.message.chat_id
-    if not r.exists(str(chat_id)):
-        update.message.reply_text("Вы еще не были зарегистрированы.")
-        return AWAITING_CODE
-
-    user_code = r.get(str(chat_id))
-    update.message.reply_text(
-        f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
-        f"Если вы хотите вернуть оповещения - заново пройдите регистрацию."
-    )
-    r.delete(str(chat_id))
-    r.srem(user_code, chat_id)
-    logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
-    return AWAITING_CODE
 
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
