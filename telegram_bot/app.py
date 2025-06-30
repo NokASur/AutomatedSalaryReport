@@ -95,7 +95,7 @@ async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAUL
         )
         r.delete(str(chat_id))
         r.delete(user_code)
-        r.srem(str(chat_id))
+        r.srem("Chat_ids", str(chat_id))
         logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
         return AWAITING_CODE
 
@@ -127,10 +127,8 @@ async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
                 logger.info(f"Message: {message} sent to {chat_id}.")
     except redis.RedisError as e:
         logger.error(f"Redis error in check_redis_and_notify: {e}")
-        await asyncio.sleep(60)
     except Exception as e:
         logger.error(f"Unexpected error in check_redis_and_notify: {e}")
-        await asyncio.sleep(60)
 
 
 def main():

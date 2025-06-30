@@ -43,7 +43,7 @@ if len(excel_files) != 0:
         for worker in workers:
             message = worker.generate_message(date)
             logger.info(f"Generated message: {message}")
-            if not r.hexists(worker.unique_id + ":meta", "State"):
+            if not r.hexists(worker.unique_id, "State"):
                 r.hset(worker.unique_id, mapping={"State": "Registered", "Message": message, "Chat_id": ""})
             else:
                 r.hset(worker.unique_id, "Message", message)
