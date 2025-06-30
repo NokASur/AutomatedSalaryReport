@@ -74,7 +74,7 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"Код подтвержден.\n"
         f"Теперь сюда будут периодически приходить краткие отчеты по вашей работе.\n"
-        f"Если вы хотите отписаться от оповещений - напищите в чат 'erase'."
+        f"Если вы хотите отписаться от оповещений - используйте команду '\erase'."
     )
     r.hset(user_code, "State", "Activated")
     r.hset(user_code, "Chat_id", str(chat_id))
@@ -85,20 +85,6 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_unauthorized_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.message.text.strip().upper()
-    if message == "ERASE":
-        chat_id = update.message.chat_id
-        user_code = r.hget(str(chat_id), "User_code")
-        await update.message.reply_text(
-            f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
-            f"Если вы хотите вернуть оповещения - заново пройдите регистрацию с помощью команды '/start'."
-        )
-        r.delete(str(chat_id))
-        r.delete(user_code)
-        r.srem("Chat_ids", str(chat_id))
-        logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
-        return AWAITING_CODE
-
     await update.message.reply_text(
         f"На данный момент бот просто присылает информацию по мере её поступления на сервер.\n"
         f"В будущем будет возможно задавать вопросы через бота. Сейчас же предлагаю просто отдохнуть :В"
@@ -131,6 +117,27 @@ async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"Unexpected error in check_redis_and_notify: {e}")
 
 
+async def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if context.user_data.get("current_state", None) == AWAITING_CODE:
+        await update.message.reply_text(
+            f"Вы еще не зарегистрированы."f" Команда /erase нужна для случаев, "
+            f"когда вы хотите перестать получить уведомления через бота"
+        )
+        return AWAITING_CODE
+
+    chat_id = update.message.chat_id
+    user_code = r.hget(str(chat_id), "User_code")
+    await update.message.reply_text(
+        f"Ваш чат удален из списка зарегистрированных, теперь вам не будут приходить оповещения о работе.\n"
+        f"Если вы хотите вернуть оповещения - заново пройдите регистрацию с помощью команды '/start'."
+    )
+    r.delete(str(chat_id))
+    r.delete(user_code)
+    r.srem("Chat_ids", str(chat_id))
+    logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
+    return AWAITING_CODE
+
+
 def main():
     logger.info("Started app")
     app = Application.builder().token(TELEGRAM_TOKEN).build()
@@ -138,8 +145,8 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            AWAITING_CODE: [MessageHandler(filters.TEXT, handle_code_input)],
-            CODE_CONFIRMED: [MessageHandler(filters.TEXT, handle_unauthorized_reply)]
+            AWAITING_CODE: [CommandHandler('start', start), MessageHandler(filters.TEXT, handle_code_input)],
+            CODE_CONFIRMED: [CommandHandler('erase', erase), MessageHandler(filters.TEXT, handle_unauthorized_reply)]
         },
         fallbacks=[CommandHandler('error', error)],
     )
