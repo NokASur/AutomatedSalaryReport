@@ -74,7 +74,7 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"Код подтвержден.\n"
         f"Теперь сюда будут периодически приходить краткие отчеты по вашей работе.\n"
-        f"Если вы хотите отписаться от оповещений - используйте команду '\erase'."
+        f"Если вы хотите отписаться от оповещений - используйте команду '/erase'."
     )
     r.hset(user_code, "State", "Activated")
     r.hset(user_code, "Chat_id", str(chat_id))
@@ -108,6 +108,7 @@ async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"Chat_id: {chat_id} found")
             user_code = r.hget(str(chat_id), "User_code")
             message = r.hget(user_code, "Message")
+            r.hset(user_code, "message", "")
             if message != "":
                 await context.bot.send_message(chat_id, message)
                 logger.info(f"Message: {message} sent to {chat_id}.")
@@ -132,7 +133,7 @@ async def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Если вы хотите вернуть оповещения - заново пройдите регистрацию с помощью команды '/start'."
     )
     r.delete(str(chat_id))
-    r.delete(user_code)
+    r.hset(user_code, "State", "Registered")
     r.srem("Chat_ids", str(chat_id))
     logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
     return AWAITING_CODE
