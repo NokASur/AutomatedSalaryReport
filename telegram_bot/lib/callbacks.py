@@ -49,7 +49,7 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
 
     if user_code in ADMIN_CODES:
-        r.sadd("ADMIN_CHATS", chat_id)
+        r.sadd("ADMIN_CHAT_IDS", chat_id)
         await update.message.reply_text(f"Админ зарегистрирован")
         return ADMIN
 
@@ -137,10 +137,10 @@ async def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def enter_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
-    user_code = r.hget(str(chat_id), "User_code")
-    if user_code not in ADMIN_CODES:
+    admin_chat_ids = r.smembers("ADMIN_CHAT_IDS")
+    if chat_id not in admin_chat_ids:
         await update.message.reply_text("Вы не являетесь админом.")
-        logger.info(f'Failed admin panel authorization. Code {user_code} not in {ADMIN_CODES}')
+        logger.info(f'Failed admin panel authorization. Chat id: {chat_id} not in admin chat ids: {admin_chat_ids}')
         return CODE_CONFIRMED
     await update.message.reply_text("Вы успешно вошли в панель управления.\n"
                                     "Используйте '/quit' или '/q' для выхода из панели управления.")
