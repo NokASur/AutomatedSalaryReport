@@ -48,7 +48,7 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_code = update.message.text.strip().upper()
     chat_id = update.message.chat_id
 
-    if user_code == ADMIN_CODES:
+    if user_code in ADMIN_CODES:
         r.sadd("ADMIN_CHATS", chat_id)
         await update.message.reply_text(f"Админ зарегистрирован")
         return ADMIN
