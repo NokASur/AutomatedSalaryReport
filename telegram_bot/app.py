@@ -1,5 +1,5 @@
-from lib.callbacks import *
-from lib.jobs import check_redis_and_notify_admins
+from telegram_bot.lib.callbacks import *
+from telegram_bot.lib.jobs import check_redis_and_notify_admins
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler
 from config.config import TELEGRAM_TOKEN
 
