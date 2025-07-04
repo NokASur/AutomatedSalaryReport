@@ -98,23 +98,6 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error("Something went wrong after user message")
 
 
-async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
-    try:
-        chat_ids = r.smembers("Chat_ids")
-        for chat_id in chat_ids:
-            logger.info(f"Chat_id: {chat_id} found")
-            user_code = r.hget(str(chat_id), "User_code")
-            message = r.hget(user_code, "Message")
-            r.hset(user_code, "Message", "")
-            if message != "":
-                await context.bot.send_message(chat_id, message)
-                logger.info(f"Message: {message} sent to {chat_id}.")
-    except redis.RedisError as e:
-        logger.error(f"Redis error in check_redis_and_notify: {e}")
-    except Exception as e:
-        logger.error(f"Unexpected error in check_redis_and_notify: {e}")
-
-
 async def quit_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Вы покинули панель управления."
                                     "\n Используйте '/admin' или '/a' чтобы вернуться.")
@@ -160,7 +143,30 @@ async def enter_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.info(f'Failed admin panel authorization')
         return CODE_CONFIRMED
     await update.message.reply_text("Вы успешно вошли в панель управления.\n"
-                                    "Используйте '/quit' или '/q' для выхода.")
+                                    "Используйте '/quit' или '/q' для выхода из панели управления.")
     logger.info(f'Admin panel entered from chat_id: {chat_id}')
     return ADMIN
 
+
+async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
+    try:
+        chat_ids = r.smembers("Chat_ids")
+        for chat_id in chat_ids:
+            logger.info(f"Chat_id: {chat_id} found")
+            user_code = r.hget(str(chat_id), "User_code")
+            message = r.hget(user_code, "Message")
+            r.hset(user_code, "Message", "")
+            if message != "":
+                await context.bot.send_message(chat_id, message)
+                logger.info(f"Message: {message} sent to {chat_id}.")
+    except redis.RedisError as e:
+        logger.error(f"Redis error in check_redis_and_notify: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error in check_redis_and_notify: {e}")
+
+
+async def confirm_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await check_redis_and_notify(context)
+    await update.message.reply_text("Текущая серия сообщений успешно подтверждена.\n"
+                                    "Используйте '/quit' или '/q' для выхода из панели управления.")
+    return ADMIN
