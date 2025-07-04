@@ -6,8 +6,8 @@ from config.config import TELEGRAM_TOKEN
 START_COMMANDS = ['start', 's']
 ERASE_COMMANDS = ['erase', 'e']
 ADMIN_COMMANDS = ['admin', 'a']
-CONFIRM_COMMANDS = ['confirm', 'c', '+']
-DISCARD_COMMANDS = ['discard', 'd', '-']
+CONFIRM_COMMANDS = ['confirm', 'c']
+DISCARD_COMMANDS = ['discard', 'd']
 QUIT_COMMANDS = ['quit', 'q']
 
 
@@ -23,15 +23,15 @@ def main():
                 MessageHandler(filters.TEXT, handle_code_input)
             ],
             CODE_CONFIRMED: [
-                CommandHandler(['erase', 'e'], erase),
-                CommandHandler(['admin', 'a'], enter_admin),
+                CommandHandler(ERASE_COMMANDS, erase),
+                CommandHandler(ADMIN_COMMANDS, enter_admin),
                 MessageHandler(filters.TEXT, handle_replies)
             ],
             ADMIN: [
-                CommandHandler('erase', erase),
-                CommandHandler(['confirm', 'c', '+'], confirm_messages),
-                CommandHandler(['discard', 'd', '-'], discard_messages),
-                CommandHandler(['quit', 'q'], quit_admin),
+                CommandHandler(ERASE_COMMANDS, erase),
+                CommandHandler(CONFIRM_COMMANDS, confirm_messages),
+                CommandHandler(DISCARD_COMMANDS, discard_messages),
+                CommandHandler(QUIT_COMMANDS, quit_admin),
                 MessageHandler(filters.TEXT, handle_replies)
             ]
         },
