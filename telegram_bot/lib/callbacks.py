@@ -144,7 +144,10 @@ async def enter_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f'Failed admin panel authorization. Chat id: {chat_id} not in admin chat ids: {admin_chat_ids}')
         return CODE_CONFIRMED
     await update.message.reply_text("Вы успешно вошли в панель управления.\n"
-                                    "Используйте '/quit' или '/q' для выхода из панели управления.")
+                                    "Используйте '/display_messages', '/show' или '/m' чтобы вывести сгенерированные сообщения.\n"
+                                    "'/confirm' или '/c' чтобы отправить сообщения работникам.\n"
+                                    "'/discard' или '/d' чтобы удалить все сгенерированные сообщения из базы данных.\n"
+                                    "'/quit' или '/q' для выхода из панели управления.")
     logger.info(f'Admin panel entered from chat_id: {chat_id}')
     return ADMIN
 
