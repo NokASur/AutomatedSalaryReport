@@ -1,4 +1,4 @@
-from callbacks import *
+from telegram_bot.lib.callbacks import *
 
 
 async def check_redis_and_notify_admins(update: Update, context: ContextTypes.DEFAULT_TYPE):
