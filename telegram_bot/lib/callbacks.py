@@ -48,7 +48,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_code = update.message.text.strip().upper()
     chat_id = update.message.chat_id
-    calling_state = context.user_data.get("state")
 
     if user_code in ADMIN_CODES:
         r.sadd("ADMIN_CHAT_IDS", chat_id)
@@ -88,16 +87,17 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     r.sadd("Chat_ids", str(chat_id))
     logger.info(f"Correct code used: {user_code}")
 
-    context.user_data["state"] = calling_state
+    context.user_data["state"] = CODE_CONFIRMED
     return context.user_data["state"]
 
 
 async def handle_replies(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    calling_state = context.user_data.get("state")
     await update.message.reply_text(
         f"На данный момент бот просто присылает информацию по мере её поступления на сервер.\n"
         f"В будущем будет возможно задавать вопросы через бота. Сейчас же предлагаю просто отдохнуть :В"
     )
-    context.user_data["state"] = CODE_CONFIRMED
+    context.user_data["state"] = calling_state
     return context.user_data["state"]
 
 
