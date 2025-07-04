@@ -1,11 +1,12 @@
 from telegram_bot.lib.callbacks import *
-from telegram_bot.lib.jobs import check_redis_and_notify_admins
+# from telegram_bot.lib.jobs import check_redis_and_notify_admins
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler
 from config.config import TELEGRAM_TOKEN
 
 START_COMMANDS = ['start', 's']
 ERASE_COMMANDS = ['erase', 'e']
 ADMIN_COMMANDS = ['admin', 'a']
+DISPLAY_COMMANDS = ['display', 'd', 'show']
 CONFIRM_COMMANDS = ['confirm', 'c']
 DISCARD_COMMANDS = ['discard', 'd']
 QUIT_COMMANDS = ['quit', 'q']
@@ -29,6 +30,7 @@ def main():
             ],
             ADMIN: [
                 CommandHandler(ERASE_COMMANDS, erase),
+                CommandHandler(DISPLAY_COMMANDS, display_messages),
                 CommandHandler(CONFIRM_COMMANDS, confirm_messages),
                 CommandHandler(DISCARD_COMMANDS, discard_messages),
                 CommandHandler(QUIT_COMMANDS, quit_admin),
@@ -40,12 +42,12 @@ def main():
 
     app.add_handler(conv_handler)
 
-    job_queue = app.job_queue
+    # job_queue = app.job_queue
 
-    job_queue.run_repeating(
-        callback=check_redis_and_notify_admins,
-        interval=10,
-    )
+    # job_queue.run_repeating(
+    #     callback=check_redis_and_notify_admins,
+    #     interval=10,
+    # )
 
     app.run_polling()
 
