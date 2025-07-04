@@ -16,7 +16,7 @@ def main():
     app = Application.builder().token(TELEGRAM_TOKEN).build()
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler(START_COMMANDS, start)],
         states={
             AWAITING_CODE: [
                 CommandHandler(START_COMMANDS, start),

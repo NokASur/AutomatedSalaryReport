@@ -140,7 +140,7 @@ async def enter_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_code = r.hget(str(chat_id), "User_code")
     if user_code not in ADMIN_CODES:
         await update.message.reply_text("Вы не являетесь админом.")
-        logger.info(f'Failed admin panel authorization')
+        logger.info(f'Failed admin panel authorization. Code {user_code} not in {ADMIN_CODES}')
         return CODE_CONFIRMED
     await update.message.reply_text("Вы успешно вошли в панель управления.\n"
                                     "Используйте '/quit' или '/q' для выхода из панели управления.")
