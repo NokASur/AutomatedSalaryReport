@@ -140,7 +140,7 @@ async def enter_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_chat_ids = r.smembers("ADMIN_CHAT_IDS")
     if chat_id not in admin_chat_ids:
         await update.message.reply_text("Вы не являетесь админом.")
-        logger.info(f'Failed admin panel authorization. Chat id: {chat_id} not in admin chat ids: {admin_chat_ids}')
+        logger.error(f'Failed admin panel authorization. Chat id: {chat_id} not in admin chat ids: {admin_chat_ids}')
         return CODE_CONFIRMED
     await update.message.reply_text("Вы успешно вошли в панель управления.\n"
                                     "Используйте '/quit' или '/q' для выхода из панели управления.")
