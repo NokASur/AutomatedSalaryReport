@@ -41,18 +41,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Пример кода: XXXX-XXXX-XXXX-XXXX"
     )
     logger.info(f"Chat initiated with user: {user}")
-    return AWAITING_CODE
+    context.user_data["state"] = AWAITING_CODE
+    return context.user_data["state"]
 
 
 async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_code = update.message.text.strip().upper()
     chat_id = update.message.chat_id
+    calling_state = context.user_data.get("state")
 
     if user_code in ADMIN_CODES:
         r.sadd("ADMIN_CHAT_IDS", chat_id)
         await update.message.reply_text(f"Админ зарегистрирован.\n"
                                         f"Используйте '/admin' или '/a' чтобы войти в панель управления")
-        return CODE_CONFIRMED
+        context.user_data["state"] = CODE_CONFIRMED
+        return context.user_data["state"]
 
     if check_code_format(user_code):
         await update.message.reply_text(
@@ -60,7 +63,9 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Корректный формат: 'XXXX-XXXX-XXXX-XXXX'."
         )
         logger.info(f"Incorrect code format: {user_code}")
-        return AWAITING_CODE
+
+        context.user_data["state"] = AWAITING_CODE
+        return context.user_data["state"]
 
     if not r.exists(user_code):
         await update.message.reply_text(
@@ -68,7 +73,10 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Попробуйте заново после того, как работодатель отправит хотя бы один отчет с вашим кодом в систему."
         )
         logger.info(f"Unauthorized code attempt: {user_code}")
-        return AWAITING_CODE
+
+        context.user_data["state"] = AWAITING_CODE
+        return context.user_data["state"]
+
     await update.message.reply_text(
         f"Код подтвержден.\n"
         f"Теперь сюда будут периодически приходить краткие отчеты по вашей работе.\n"
@@ -79,7 +87,9 @@ async def handle_code_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     r.hset(str(chat_id), "User_code", user_code)
     r.sadd("Chat_ids", str(chat_id))
     logger.info(f"Correct code used: {user_code}")
-    return CODE_CONFIRMED
+
+    context.user_data["state"] = calling_state
+    return context.user_data["state"]
 
 
 async def handle_replies(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -87,7 +97,8 @@ async def handle_replies(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"На данный момент бот просто присылает информацию по мере её поступления на сервер.\n"
         f"В будущем будет возможно задавать вопросы через бота. Сейчас же предлагаю просто отдохнуть :В"
     )
-    return CODE_CONFIRMED
+    context.user_data["state"] = CODE_CONFIRMED
+    return context.user_data["state"]
 
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -97,12 +108,15 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Так будет проще отследить причины ошибки. Спасибо!"
     )
     logger.error("Something went wrong after user message")
+    context.user_data["state"] = AWAITING_CODE
+    return context.user_data["state"]
 
 
 async def quit_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Вы покинули панель управления."
                                     "\n Используйте '/admin' или '/a' чтобы вернуться.")
-    return CODE_CONFIRMED
+    context.user_data["state"] = CODE_CONFIRMED
+    return context.user_data["state"]
 
 
 async def discard_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -116,12 +130,13 @@ async def discard_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if context.user_data.get("current_state", None) == AWAITING_CODE:
+    if context.user_data.get("state", None) == AWAITING_CODE:
         await update.message.reply_text(
-            f"Вы еще не зарегистрированы."f" Команда /erase нужна для случаев, "
-            f"когда вы хотите перестать получить уведомления через бота"
+            f"Вы еще не зарегистрированы.\n"
+            f"Команда /erase нужна для случаев, когда вы хотите перестать получить уведомления через бота"
         )
-        return AWAITING_CODE
+        context.user_data["state"] = AWAITING_CODE
+        return context.user_data["state"]
 
     chat_id = update.message.chat_id
     user_code = r.hget(str(chat_id), "User_code")
@@ -133,7 +148,8 @@ async def erase(update: Update, context: ContextTypes.DEFAULT_TYPE):
     r.hset(user_code, "State", "Registered")
     r.srem("Chat_ids", str(chat_id))
     logger.info(f"user_code: {user_code} from chat_id: {chat_id} successfully erased.")
-    return AWAITING_CODE
+    context.user_data["state"] = AWAITING_CODE
+    return context.user_data["state"]
 
 
 async def enter_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -149,7 +165,8 @@ async def enter_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     "'/discard' или '/d' чтобы удалить все сгенерированные сообщения из базы данных.\n"
                                     "'/quit' или '/q' для выхода из панели управления.")
     logger.info(f'Admin panel entered from chat_id: {chat_id}')
-    return ADMIN
+    context.user_data["state"] = ADMIN
+    return context.user_data["state"]
 
 
 async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
@@ -173,7 +190,8 @@ async def confirm_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await check_redis_and_notify(context)
     await update.message.reply_text("Текущая серия сообщений успешно подтверждена.\n"
                                     "Используйте '/quit' или '/q' для выхода из панели управления.")
-    return ADMIN
+    context.user_data["state"] = ADMIN
+    return context.user_data["state"]
 
 
 async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -196,8 +214,10 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(int(admin_chat_id), "Новый список сообщений:")
             await context.bot.send_message(int(admin_chat_id), full_message)
             await context.bot.send_message(int(admin_chat_id),
-                                           "Для того чтобы подтвердить корректность сгенерированных сообщений, введите команду '/confirm'\n"
-                                           "Для удаления сообщений - '/discard'")
+                                           "Для того чтобы подтвердить корректность сгенерированных сообщений, введите команду '/confirm' или '/c'\n"
+                                           "Для удаления сообщений - '/discard' или '/d'")
+            context.user_data["state"] = ADMIN
+            return context.user_data["state"]
 
     except redis.RedisError as e:
         logger.error(f"Redis error in check_redis_and_notify: {e}")
