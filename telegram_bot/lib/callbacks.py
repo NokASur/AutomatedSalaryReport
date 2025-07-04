@@ -6,7 +6,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from logs.logging_module import logger, generate_handler
 from config.config import REDIS_PASSWORD, REDIS_HOST, REDIS_PORT, ADMIN_CODES, TEST_CODE
-from helpers import check_code_format
+from telegram_bot.lib.helpers import check_code_format
 
 r = redis.Redis(
     host=REDIS_HOST,
