@@ -3,14 +3,6 @@ from telegram_bot.lib.callbacks import *
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler
 from config.config import TELEGRAM_TOKEN
 
-START_COMMANDS = ['start', 's']
-ERASE_COMMANDS = ['erase', 'e']
-ADMIN_COMMANDS = ['admin', 'a']
-DISPLAY_COMMANDS = ['display', 'd', 'show']
-CONFIRM_COMMANDS = ['confirm', 'c']
-DISCARD_COMMANDS = ['discard', 'd']
-QUIT_COMMANDS = ['quit', 'q']
-
 
 def main():
     logger.info("Started app")
@@ -21,15 +13,18 @@ def main():
         states={
             AWAITING_CODE: [
                 CommandHandler(START_COMMANDS, start),
+                CommandHandler(HELP_COMMANDS, help_message),
                 MessageHandler(filters.TEXT, handle_code_input)
             ],
             CODE_CONFIRMED: [
                 CommandHandler(ERASE_COMMANDS, erase),
+                CommandHandler(HELP_COMMANDS, help_message),
                 CommandHandler(ADMIN_COMMANDS, enter_admin),
                 MessageHandler(filters.TEXT, handle_replies)
             ],
-            ADMIN: [
+            ADMIN_PANEL: [
                 CommandHandler(ERASE_COMMANDS, erase),
+                CommandHandler(HELP_COMMANDS, help_message),
                 CommandHandler(DISPLAY_COMMANDS, display_messages),
                 CommandHandler(CONFIRM_COMMANDS, confirm_messages),
                 CommandHandler(DISCARD_COMMANDS, discard_messages),
