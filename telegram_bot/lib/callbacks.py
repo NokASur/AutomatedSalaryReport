@@ -183,7 +183,6 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_count = 0
     full_message = ""
     try:
-        admin_chat_ids = r.smembers("ADMIN_CHATS")
         chat_ids = r.smembers("Chat_ids")
         logger.info(chat_ids)
         for chat_id in chat_ids:
@@ -197,9 +196,8 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 full_message += f"Сообщение {message_count}\n{message}\n\n"
                 logger.info(f"FMessage: {full_message}")
 
-        for admin_chat_id in admin_chat_ids:
-            await update.message.reply_text(f"Новых сообщений: {message_count}")
-            await update.message.reply_text(full_message)
+        await update.message.reply_text(f"Новых сообщений: {message_count}")
+        await update.message.reply_text(full_message)
 
         context.user_data["state"] = ADMIN_PANEL
         return context.user_data["state"]
