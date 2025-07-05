@@ -161,6 +161,8 @@ async def check_redis_and_notify(context: ContextTypes.DEFAULT_TYPE):
             user_code = r.hget(str(chat_id), "User_code")
             message = r.hget(user_code, "Message")
             r.hset(user_code, "Message", "")
+            # await context.bot.send_message(chat_id, message)
+            # logger.info(f"Message: {message} sent to {chat_id}.")
             if message != "":
                 await context.bot.send_message(chat_id, message)
                 logger.info(f"Message: {message} sent to {chat_id}.")
@@ -187,17 +189,16 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"Chat_id: {chat_id} found")
             user_code = r.hget(str(chat_id), "User_code")
             message = r.hget(user_code, "Message")
-            r.hset(user_code, "Message", "")
             if message != "":
                 message_count += 1
                 full_message += f"Сообщение {message_count}\n{message}\n\n"
-                # await context.bot.send_message(chat_id, message)
-                # logger.info(f"Message: {message} sent to {chat_id}.")
+
         for admin_chat_id in admin_chat_ids:
             await context.bot.send_message(int(admin_chat_id), f"Новых сообщений: {message_count}")
             await context.bot.send_message(int(admin_chat_id), full_message)
-            context.user_data["state"] = ADMIN_PANEL
-            return context.user_data["state"]
+
+        context.user_data["state"] = ADMIN_PANEL
+        return context.user_data["state"]
 
     except redis.RedisError as e:
         logger.error(f"Redis error in check_redis_and_notify: {e}")
@@ -208,8 +209,8 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f'Help request from {context.user_data["state"]}.\n'
                 f'Covered states: {HELP_MESSAGES}.\n'
-                f'Reply: Ваш текущий статус диалога: {HELP_MESSAGES[context.user_data["state"]][0]}.\n'
-                f"Доступные команды:\n{HELP_MESSAGES[context.user_data['state']][1]}.")
-    await update.message.reply_text(f"Ваш текущий статус диалога: {HELP_MESSAGES[context.user_data['state']][0]}.\n"
-                                    f"Доступные команды:\n{HELP_MESSAGES[context.user_data['state']][1]}.")
+                f'Reply: Ваш текущий статус диалога: {HELP_MESSAGES[context.user_data["state"]][0]}\n'
+                f"Доступные команды:\n{HELP_MESSAGES[context.user_data['state']][1]}")
+    await update.message.reply_text(f"Ваш текущий статус диалога: {HELP_MESSAGES[context.user_data['state']][0]}\n"
+                                    f"Доступные команды:\n{HELP_MESSAGES[context.user_data['state']][1]}")
     return context.user_data["state"]
