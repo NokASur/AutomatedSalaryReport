@@ -16,6 +16,8 @@ r = redis.Redis(
     decode_responses=True
 )
 
+r.delete("Chat_ids")
+
 r.hset(TEST_CODE, mapping={"State": "Registered", "Message": "Test message"})
 
 log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
