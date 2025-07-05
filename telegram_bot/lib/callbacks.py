@@ -189,7 +189,7 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"Chat_id: {chat_id} found")
             user_code = r.hget(str(chat_id), "User_code")
             message = r.hget(user_code, "Message")
-            if message != "":
+            if message:
                 message_count += 1
                 full_message += f"Сообщение {message_count}\n{message}\n\n"
 
