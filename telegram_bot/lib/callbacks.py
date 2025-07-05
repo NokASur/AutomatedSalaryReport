@@ -206,6 +206,8 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def help_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info(f'Help request from {context.user_data["state"]}.\n'
+                f'Covered states: {HELP_MESSAGES}.')
     await context.bot.send_message(f"Ваш текущий статус диалога: {HELP_MESSAGES[context.user_data['state']][0]}.\n"
                                    f"Доступные команды:\n{HELP_MESSAGES[context.user_data['state']][1]}.")
     return context.user_data["state"]
