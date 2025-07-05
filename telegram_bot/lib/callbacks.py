@@ -16,7 +16,7 @@ r = redis.Redis(
     decode_responses=True
 )
 
-r.delete("Chat_ids")
+# r.delete("Chat_ids")
 
 r.hset(TEST_CODE, mapping={"State": "Registered", "Message": "Test message"})
 
@@ -199,7 +199,10 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 current_full_message_part += f"Сообщение {message_count}\n{message}\n\n"
                 logger.info(f"FMessage: {current_full_message_part}")
                 if message_count % 5 == 0:
+                    full_message.append(current_full_message_part)
                     current_full_message_part = ""
+        if message_count != 0:
+            full_message.append(current_full_message_part)
 
         await update.message.reply_text(f"Новых сообщений: {message_count}")
         for message_part in full_message:
