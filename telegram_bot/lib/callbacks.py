@@ -185,6 +185,7 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         admin_chat_ids = r.smembers("ADMIN_CHATS")
         chat_ids = r.smembers("Chat_ids")
+        logger.info(chat_ids)
         for chat_id in chat_ids:
             logger.info(f"Chat_id: {chat_id} found")
             user_code = r.hget(str(chat_id), "User_code")
@@ -194,6 +195,7 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if message:
                 message_count += 1
                 full_message += f"Сообщение {message_count}\n{message}\n\n"
+                logger.info(f"FMessage: {full_message}")
 
         for admin_chat_id in admin_chat_ids:
             await context.bot.send_message(int(admin_chat_id), f"Новых сообщений: {message_count}")
