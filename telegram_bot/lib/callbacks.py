@@ -198,8 +198,8 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.info(f"FMessage: {full_message}")
 
         for admin_chat_id in admin_chat_ids:
-            await context.bot.send_message(int(admin_chat_id), f"Новых сообщений: {message_count}")
-            await context.bot.send_message(int(admin_chat_id), full_message)
+            await update.message.reply_text(f"Новых сообщений: {message_count}")
+            await update.message.reply_text(full_message)
 
         context.user_data["state"] = ADMIN_PANEL
         return context.user_data["state"]
