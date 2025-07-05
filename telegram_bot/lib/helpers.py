@@ -7,7 +7,7 @@
 START_COMMANDS = ['start', 's']
 ERASE_COMMANDS = ['erase', 'e']
 ADMIN_COMMANDS = ['admin', 'a']
-DISPLAY_COMMANDS = ['display_messages', 'd', 'show']
+DISPLAY_COMMANDS = ['messages', 'm', 'show']
 CONFIRM_COMMANDS = ['confirm', 'c']
 DISCARD_COMMANDS = ['discard', 'd']
 QUIT_COMMANDS = ['quit', 'q']
@@ -30,7 +30,7 @@ HELP_MESSAGES: dict[int:(str, str)] = {
         "Панель управления.",
         "'/erase', '/e' - сброс диалога с ботом.\n"
         "'/help', '/h' - вывести все доступные команды.\n"
-        "'/display_messages', '/d', '/show' - вывести список сгенерированных сообщений.\n"
+        "'/messages', '/m', '/show' - вывести список сгенерированных сообщений.\n"
         "'/confirm', '/c' - отправить все сообщения работникам.\n"
         "'/discard', '/d' - удалить все сообщения.\n"
         "'/quit', '/q' - выйти из панели управления."
