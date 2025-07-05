@@ -183,8 +183,9 @@ async def confirm_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_count = 0
-    full_message = ""
+    full_message = []
     try:
+        current_full_message_part = ""
         chat_ids = r.smembers("Chat_ids")
         logger.info(chat_ids)
         for chat_id in chat_ids:
@@ -195,11 +196,14 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"Message: {message} found")
             if message:
                 message_count += 1
-                full_message += f"Сообщение {message_count}\n{message}\n\n"
-                logger.info(f"FMessage: {full_message}")
+                current_full_message_part += f"Сообщение {message_count}\n{message}\n\n"
+                logger.info(f"FMessage: {current_full_message_part}")
+                if message_count % 5 == 0:
+                    current_full_message_part = ""
 
         await update.message.reply_text(f"Новых сообщений: {message_count}")
-        await update.message.reply_text(full_message)
+        for message_part in full_message:
+            await update.message.reply_text(message_part)
 
         context.user_data["state"] = ADMIN_PANEL
         return context.user_data["state"]
