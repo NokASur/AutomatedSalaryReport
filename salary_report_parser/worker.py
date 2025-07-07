@@ -87,11 +87,11 @@ class Worker:
         message = random.choice(greetings)
         work_flag = False
 
-        if any(wt.strip() for wt in self.work_type):
+        if any(wt for wt in self.work_type):
             message += random.choice(work_type_phrases)
             work_flag = True
 
-        if any(h.strip() and s.strip() for h, s in zip(self.hours_worked, self.salary_for_day)):
+        if any(h and s for h, s in zip(self.hours_worked, self.salary_for_day)):
             message += random.choice(daily_stats)
             work_flag = True
 
