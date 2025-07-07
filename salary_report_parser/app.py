@@ -24,7 +24,7 @@ def safe_stoi_convertion(s: str | None) -> int | None:
 
 
 # A slobby amoeba
-def parse_excel_report(path: str) -> (list[Worker], str):
+def parse_excel_report(path: str) -> (dict[str, Worker], str):
     path = os.path.abspath(path)
 
     logger.info(f"Trying to parse: {path}")
@@ -32,8 +32,7 @@ def parse_excel_report(path: str) -> (list[Worker], str):
     sheet_names = workbook.sheetnames
     last_sheet_name = sheet_names[-1]
     sheet = workbook[last_sheet_name]
-
-    workers = []
+    workers_dict = {}
     date = sheet.cell(row=3, column=3).value.strftime("%d-%m-%Y")
 
     for row in sheet.iter_rows(min_row=8, values_only=True):
@@ -44,23 +43,24 @@ def parse_excel_report(path: str) -> (list[Worker], str):
                 name=row[2],
                 machine_type=row[3],
                 commentary=row[4],
-                work_type=row[5],
-                mark1=row[6],
-                mark2=row[7],
-                run_count1=row[8],
-                run_count2=row[9],
-                hours_worked=round(safe_stoi_convertion(row[10]), 2) if safe_stoi_convertion(row[10]) else None,
-                hours_worked_sum=round(safe_stoi_convertion(row[11]), 2) if safe_stoi_convertion(row[11]) else None,
-                days_worked=round(safe_stoi_convertion(row[12]), 2) if safe_stoi_convertion(row[12]) else None,
-                salary_for_day=round(safe_stoi_convertion(row[13]), 2) if safe_stoi_convertion(row[13]) else None,
-                salary_for_month=round(safe_stoi_convertion(row[14]), 2) if safe_stoi_convertion(row[14]) else None,
-                repair_days_count=row[15],
-                absence_reason=row[16],
+                work_type=[row[5]] if row[5] else [""],
+                mark=[row[6]] if row[6] else [""],
+                run_count=[row[7]] if row[7] else [""],
+                hours_worked=[round(safe_stoi_convertion(row[8]), 2)] if safe_stoi_convertion(row[8]) else [""],
+                hours_worked_sum=round(safe_stoi_convertion(row[9]), 2) if safe_stoi_convertion(row[9]) else None,
+                days_worked=round(safe_stoi_convertion(row[10]), 2) if safe_stoi_convertion(row[10]) else None,
+                salary_for_day=[round(safe_stoi_convertion(row[11]), 2)] if safe_stoi_convertion(row[11]) else [""],
+                salary_for_month=round(safe_stoi_convertion(row[12]), 2) if safe_stoi_convertion(row[12]) else None,
+                repair_days_count=row[13],
+                absence_reason=row[14],
             )
-            workers.append(worker)
+            if workers_dict.get(worker.unique_id) is None:
+                workers_dict[worker.unique_id] = worker
+            else:
+                workers_dict[worker.unique_id].merge_workers(worker)
     logger.info(f"Parsed successfully")
     workbook.close()
-    return workers, date
+    return workers_dict, date
 
 # test
 

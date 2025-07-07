@@ -88,10 +88,8 @@ excel_file_names = report_scanner()
 
 if len(excel_file_names) == 1:
     ssh: SSHClient | None = None
-    sftp: SFTPClient | None = None
     try:
         ssh = initialize_connection()
-        sftp = ssh.open_sftp()
         for file in excel_file_names:
             if os.path.exists(file):
                 print(file)
@@ -110,8 +108,6 @@ if len(excel_file_names) == 1:
     except Exception as e:
         logger.error(f"Unknown Error: {e}")
     finally:
-        if sftp is not None:
-            sftp.close()
         if ssh is not None:
             ssh.close()
 

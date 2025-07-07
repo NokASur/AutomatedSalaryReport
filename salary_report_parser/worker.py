@@ -1,5 +1,6 @@
 import random
 
+
 class Worker:
     def __init__(
             self,
@@ -7,15 +8,13 @@ class Worker:
             name: str | None = None,
             machine_type: str | None = None,
             commentary: str | None = None,
-            work_type: str | None = None,
-            mark1: int | None = None,
-            mark2: int | None = None,
-            run_count1: str | None = None,
-            run_count2: str | None = None,
-            hours_worked: int | None = None,
+            work_type: list[str] | None = None,
+            mark: list[str] | None = None,
+            run_count: list[str] | None = None,
+            hours_worked: list[str] | None = None,
             hours_worked_sum: int | None = None,
             days_worked: int | None = None,
-            salary_for_day: int | None = None,
+            salary_for_day: list[str] | None = None,
             salary_for_month: int | None = None,
             repair_days_count: int | None = None,
             absence_reason: str | None = None,
@@ -26,10 +25,8 @@ class Worker:
         self.machine_type = machine_type
         self.commentary = commentary
         self.work_type = work_type
-        self.mark1 = mark1
-        self.mark2 = mark2
-        self.run_count1 = run_count1
-        self.run_count2 = run_count2
+        self.mark = mark
+        self.run_count = run_count
         self.hours_worked = hours_worked
         self.hours_worked_sum = hours_worked_sum
         self.days_worked = days_worked
@@ -39,6 +36,9 @@ class Worker:
         self.absence_reason = absence_reason
 
     def generate_message(self, date: str) -> str:
+        if self.absence_reason:
+            return f"Сегодня вы не работали по причине: {self.absence_reason}."
+
         greetings = [
             f"Привет, {self.name}! Вот отчёт за {date}:\n",
             f"Здравствуйте, {self.name}! Статистика за {date}:\n",
@@ -48,19 +48,19 @@ class Worker:
         ]
 
         work_type_phrases = [
-            f"Сегодня вы работали над: {self.work_type}.\n",
-            f"В этот день вашими задачами были: {self.work_type}.\n",
-            f"Вы занимались следующим: {self.work_type}.\n",
-            f"Задачи на этот день: {self.work_type}.\n",
-            f"Сегодняшняя работа включала: {self.work_type}.\n"
+            f"Сегодня вы работали над следующими задачами: {', '.join(self.work_type)}.\n",
+            f"В этот день вы занимались: {', '.join(self.work_type)}.\n",
+            f"Ваши задачи на сегодня: {', '.join(self.work_type)}.\n",
+            f"Сегодняшняя работа включала: {', '.join(self.work_type)}.\n",
+            f"Вы работали над: {', '.join(self.work_type)}.\n"
         ]
 
         daily_stats = [
-            f"Отработано часов: {self.hours_worked}. Заработок: {self.salary_for_day} руб.\n",
-            f"Сегодняшний результат: {self.hours_worked} часов = {self.salary_for_day} руб.\n",
-            f"Вы трудились {self.hours_worked} ч. и заработали {self.salary_for_day} руб.\n",
-            f"Итог дня: {self.hours_worked} ч. работы → {self.salary_for_day} руб.\n",
-            f"За день вышло {self.hours_worked} рабочих часа, сумма: {self.salary_for_day} руб.\n"
+            f"Отработано: {', '.join([f'{h} ч. ({s} руб.)' for h, s in zip(self.hours_worked, self.salary_for_day)])}.\n",
+            f"Результат дня: {', '.join([f'{h} ч. = {s} руб.' for h, s in zip(self.hours_worked, self.salary_for_day)])}.\n",
+            f"Вы трудились: {', '.join([f'{h} ч. ({s} руб.)' for h, s in zip(self.hours_worked, self.salary_for_day)])}.\n",
+            f"Итог дня: {', '.join([f'{h} ч. → {s} руб.' for h, s in zip(self.hours_worked, self.salary_for_day)])}.\n",
+            f"За день: {', '.join([f'{h} ч. ({s} руб.)' for h, s in zip(self.hours_worked, self.salary_for_day)])}.\n"
         ]
 
         monthly_stats = [
@@ -85,13 +85,13 @@ class Worker:
         ]
 
         message = random.choice(greetings)
-
-        if self.work_type:
-            message += random.choice(work_type_phrases)
-
         work_flag = False
 
-        if self.hours_worked and self.salary_for_day:
+        if any(wt.strip() for wt in self.work_type):
+            message += random.choice(work_type_phrases)
+            work_flag = True
+
+        if any(h.strip() and s.strip() for h, s in zip(self.hours_worked, self.salary_for_day)):
             message += random.choice(daily_stats)
             work_flag = True
 
@@ -103,3 +103,10 @@ class Worker:
             message += random.choice(encouragements)
 
         return message
+
+    def merge_workers(self, worker):
+        self.work_type.extend(worker.work_type)
+        self.mark.extend(worker.mark)
+        self.run_count.extend(worker.run_count)
+        self.salary_for_day.extend(worker.salary_for_day)
+        self.hours_worked.extend(worker.hours_worked)

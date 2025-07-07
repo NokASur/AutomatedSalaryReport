@@ -37,10 +37,9 @@ if len(excel_files) != 0:
     logger.info(f"{len(excel_files)} excel files found.")
     for excel_file_path in excel_files:
         logger.info(f"Parsing {excel_file_path}")
-        workers: list[Worker]
-        date: str
+        workers: dict
         workers, date = parse_excel_report(excel_file_path)
-        for worker in workers:
+        for _, worker in workers.items():
             message = worker.generate_message(date)
             logger.info(f"Generated message: {message}")
             if not r.hexists(worker.unique_id, "State"):
