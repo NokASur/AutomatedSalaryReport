@@ -58,6 +58,8 @@ def parse_excel_report(path: str) -> (dict[str, Worker], str):
                 workers_dict[worker.unique_id] = worker
             else:
                 workers_dict[worker.unique_id].merge_workers(worker)
+        if row[1] is None:
+            logger.info("Special data is skipped")
     logger.info(f"Parsed successfully")
     workbook.close()
     return workers_dict, date
