@@ -36,7 +36,7 @@ def parse_excel_report(path: str) -> (dict[str, Worker], str):
     date = sheet.cell(row=3, column=3).value.strftime("%d-%m-%Y")
 
     for row in sheet.iter_rows(min_row=8, values_only=True):
-        if row[0] is not None:
+        if row[0] is not None and row[1] is not None:
             # RE DO
             worker = Worker(
                 unique_id=row[1],
