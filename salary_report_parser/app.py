@@ -47,7 +47,7 @@ def parse_excel_report(path: str) -> (dict[str, Worker], str):
                 mark=[row[6]] if row[6] else [""],
                 run_count=[row[7]] if row[7] else [""],
                 hours_worked=[round(safe_stoi_convertion(row[8]), 2)] if safe_stoi_convertion(row[8]) else [""],
-                hours_worked_sum=round(safe_stoi_convertion(row[9]), 2) if safe_stoi_convertion(row[9]) else None,
+                hours_worked_sum=row[9] if row[9] else None,
                 days_worked=round(safe_stoi_convertion(row[10]), 2) if safe_stoi_convertion(row[10]) else None,
                 salary_for_day=[round(safe_stoi_convertion(row[11]), 2)] if safe_stoi_convertion(row[11]) else [""],
                 salary_for_month=round(safe_stoi_convertion(row[12]), 2) if safe_stoi_convertion(row[12]) else None,
