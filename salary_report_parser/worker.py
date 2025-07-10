@@ -95,10 +95,10 @@ class Worker:
             message += random.choice(daily_stats)
             work_flag = True
 
-        if self.days_worked and self.hours_worked_sum:
+        if self.salary_for_month is not None and self.hours_worked_sum is not None:
             message += random.choice(monthly_stats)
             work_flag = True
-
+        print("Зарплата за месяц и наработано часов: ", self.salary_for_month, self.hours_worked_sum)
         if work_flag:
             message += random.choice(encouragements)
 
