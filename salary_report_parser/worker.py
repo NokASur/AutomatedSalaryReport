@@ -36,9 +36,6 @@ class Worker:
         self.absence_reason = absence_reason
 
     def generate_message(self, date: str) -> str:
-        if self.absence_reason:
-            return f"Сегодня вы не работали по причине: {self.absence_reason}."
-
         greetings = [
             f"Привет, {self.name}! Вот отчёт за {date}:\n",
             f"Здравствуйте, {self.name}! Статистика за {date}:\n",
@@ -85,6 +82,12 @@ class Worker:
         ]
 
         message = random.choice(greetings)
+        if self.absence_reason:
+            message += f"Сегодня вы не работали по причине: {self.absence_reason}."
+            if self.salary_for_month is not None and self.hours_worked_sum is not None:
+                message += random.choice(monthly_stats)
+            return message
+
         work_flag = False
 
         if any(wt for wt in self.work_type):
