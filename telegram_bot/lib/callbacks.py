@@ -183,6 +183,7 @@ async def confirm_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_count = 0
+    worker_codes = []
     full_message = []
     try:
         current_full_message_part = ""
@@ -196,7 +197,9 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"Message: {message} found")
             if message:
                 message_count += 1
-                current_full_message_part += f"Сообщение {message_count}\n{message}\n\n"
+                current_full_message_part += (f"Сообщение {message_count}\n"
+                                              f"Код работника {user_code}\n"
+                                              f"{message}\n\n")
                 logger.info(f"FMessage: {current_full_message_part}")
                 if message_count % 5 == 0:
                     full_message.append(current_full_message_part)
