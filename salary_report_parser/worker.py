@@ -83,7 +83,7 @@ class Worker:
 
         message = random.choice(greetings)
         if self.absence_reason:
-            message += f"Сегодня вы не работали по причине: {self.absence_reason}."
+            message += f"Сегодня вы не работали по причине: {self.absence_reason}.\n"
             if self.salary_for_month is not None and self.hours_worked_sum is not None:
                 message += random.choice(monthly_stats)
             return message
