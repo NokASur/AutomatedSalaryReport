@@ -196,6 +196,7 @@ async def display_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"Message: {message} found")
             if message:
                 message_count += 1
+                logger.info(f"User code: {user_code} found")
                 current_full_message_part += f"Сообщение {message_count}\nКод работника {user_code}\n{message}\n\n"
                 logger.info(f"FMessage: {current_full_message_part}")
                 if message_count % 5 == 0:

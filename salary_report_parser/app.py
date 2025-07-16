@@ -1,4 +1,4 @@
-from salary_report_parser.worker import Worker
+from salary_report_parser.worker import Worker, Job
 from openpyxl import load_workbook
 import logging
 from logs.logging_module import logger, generate_handler
@@ -38,26 +38,38 @@ def parse_excel_report(path: str) -> (dict[str, Worker], str):
     for row in sheet.iter_rows(min_row=8, values_only=True):
         if row[0] is not None and row[1] is not None:
             # RE DO
+            work_type = row[5]
+            mark = row[6]
+            tonns = row[7]
+            runs = row[8]
+            hectars = row[9]
+            hours = row[10]
+            salary_for_day = row[13]
+            job = Job(
+                work_type=work_type,
+                mark=mark,
+                tonns=tonns,
+                runs=runs,
+                hectars=hectars,
+                hours=hours,
+                salary_for_day=salary_for_day)
+
             worker = Worker(
                 unique_id=row[1],
                 name=row[2],
                 machine_type=row[3],
                 commentary=row[4],
-                work_type=[row[5]] if row[5] else [""],
-                mark=[row[6]] if row[6] else [""],
-                run_count=[row[7]] if row[7] else [""],
-                hours_worked=[round(safe_stoi_convertion(row[8]), 2)] if safe_stoi_convertion(row[8]) else [""],
-                hours_worked_sum=round(safe_stoi_convertion(row[9]), 2) if safe_stoi_convertion(row[9]) else None,
-                days_worked=row[10],
-                salary_for_day=[round(safe_stoi_convertion(row[11]), 2)] if safe_stoi_convertion(row[11]) else [""],
-                salary_for_month=round(safe_stoi_convertion(row[12]), 2) if safe_stoi_convertion(row[12]) else None,
-                repair_days_count=row[13],
-                absence_reason=row[14],
+                hours_worked_sum=round(safe_stoi_convertion(row[11]), 2) if safe_stoi_convertion(row[11]) else None,
+                days_worked=row[12],
+                salary_for_month=round(safe_stoi_convertion(row[14]), 2) if safe_stoi_convertion(row[14]) else None,
+                repair_days_count=row[15],
+                absence_reason=row[16],
+                jobs=[job]
             )
             if workers_dict.get(worker.unique_id) is None:
                 workers_dict[worker.unique_id] = worker
             else:
-                workers_dict[worker.unique_id].merge_workers(worker)
+                workers_dict[worker.unique_id].add_jobs_from(worker)
         if row[1] is None:
             logger.info("Special data is skipped")
     logger.info(f"Parsed successfully")
