@@ -1,4 +1,15 @@
 import random
+import logging
+import os
+from logs.logging_module import logger, generate_handler
+
+log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+
+os.makedirs(log_path, exist_ok=True)
+logger.addHandler(generate_handler(os.path.join(log_path, "worker_all.log"), logging.DEBUG))
+logger.addHandler(generate_handler(os.path.join(log_path, "worker_info.log"), logging.INFO))
+logger.setLevel(logging.DEBUG)
+logger.info(f"Logger enabled")
 
 
 class Job:
@@ -37,6 +48,9 @@ class Job:
 
         if self.salary_for_day is not None:
             message += f"Выручка за день за данную работу: {self.salary_for_day}.\n"
+
+        logger.info(
+            f"tonns: {self.salary_for_day}, hectars:{self.hectars}, runs:{self.runs}, salary_for_day:{self.salary_for_day}")
 
         return message
 
