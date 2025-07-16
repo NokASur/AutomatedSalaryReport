@@ -117,7 +117,7 @@ class Worker:
         if len(self.jobs) > 0:
             message += random.choice(work_type_phrases)
             for job in self.jobs:
-                message += job.generate_message()
+                message += job.generate_job_message()
             work_flag = True
 
         if self.salary_for_month is not None and self.hours_worked_sum is not None:
