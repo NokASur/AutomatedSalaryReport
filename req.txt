@@ -5,5 +5,4 @@ scp
 google_auth_oauthlib
 google_api_python_client
 python-telegram-bot
-"python-telegram-bot[job-queue]"
 redis
