@@ -44,8 +44,9 @@ class Job:
             job_metric_used = True
 
         if not job_metric_used:
-            message += "К сожалению, подробности работы не были указаны."
-
+            message += "К сожалению, подробности работы не были указаны.\n"
+        else:
+            message += f"Цена за единицу работы: {self.mark}.\n"
         if self.salary_for_day is not None:
             message += f"Выручка за день за данную работу: {self.salary_for_day}.\n"
 
