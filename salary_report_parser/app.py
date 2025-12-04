@@ -47,12 +47,12 @@ def parse_excel_report(path: str) -> (dict[str, Worker], str):
             salary_for_day = row[13]
             job = Job(
                 work_type=work_type,
-                mark=mark,
-                tonns=tonns,
-                runs=runs,
-                hectars=hectars,
-                hours=hours,
-                salary_for_day=salary_for_day)
+                mark=round(safe_stoi_convertion(mark), 2) if safe_stoi_convertion(mark) else None,
+                tonns=round(safe_stoi_convertion(tonns), 2)if safe_stoi_convertion(tonns) else None,
+                runs=round(safe_stoi_convertion(runs), 2)if safe_stoi_convertion(runs) else None,
+                hectars=round(safe_stoi_convertion(hectars), 2) if safe_stoi_convertion(hectars) else None,
+                hours=round(safe_stoi_convertion(hours), 2) if safe_stoi_convertion(hours) else None ,
+                salary_for_day=round(safe_stoi_convertion(salary_for_day), 2) if safe_stoi_convertion(salary_for_day) else None)
 
             worker = Worker(
                 unique_id=row[1],
