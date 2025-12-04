@@ -38,13 +38,13 @@ def parse_excel_report(path: str) -> (dict[str, Worker], str):
     for row in sheet.iter_rows(min_row=8, values_only=True):
         if row[0] is not None and row[1] is not None:
             # RE DO
-            work_type = row[5]
-            mark = row[6]
-            tonns = row[7]
-            runs = row[8]
-            hectars = row[9]
-            hours = row[10]
-            salary_for_day = row[13]
+            work_type = row[4]
+            mark = row[5]
+            tonns = row[6]
+            runs = row[7]
+            hectars = row[8]
+            hours = row[9]
+            salary_for_day = row[12]
             job = Job(
                 work_type=work_type,
                 mark=round(safe_stoi_convertion(mark), 2) if safe_stoi_convertion(mark) else None,
@@ -58,12 +58,12 @@ def parse_excel_report(path: str) -> (dict[str, Worker], str):
                 unique_id=row[1],
                 name=row[2],
                 machine_type=row[3],
-                commentary=row[4],
-                hours_worked_sum=round(safe_stoi_convertion(row[11]), 2) if safe_stoi_convertion(row[11]) else None,
-                days_worked=row[12],
-                salary_for_month=round(safe_stoi_convertion(row[14]), 2) if safe_stoi_convertion(row[14]) else None,
-                repair_days_count=row[15],
-                absence_reason=row[16],
+                # commentary=row[4],
+                hours_worked_sum=round(safe_stoi_convertion(row[10]), 2) if safe_stoi_convertion(row[10]) else None,
+                days_worked=row[11],
+                salary_for_month=round(safe_stoi_convertion(row[13]), 2) if safe_stoi_convertion(row[13]) else None,
+                repair_days_count=row[14],
+                absence_reason=row[15],
                 jobs=[job]
             )
             if workers_dict.get(worker.unique_id) is None:

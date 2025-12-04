@@ -62,7 +62,7 @@ class Worker:
             unique_id: str | None = None,
             name: str | None = None,
             machine_type: str | None = None,
-            commentary: str | None = None,
+            # commentary: str | None = None,
             hours_worked_sum: int | None = None,
             days_worked: int | None = None,
             salary_for_month: int | None = None,
@@ -74,7 +74,7 @@ class Worker:
         self.unique_id = unique_id
         self.name = name
         self.machine_type = machine_type
-        self.commentary = commentary
+        # self.commentary = commentary
         self.hours_worked_sum = hours_worked_sum
         self.days_worked = days_worked
         self.salary_for_month = salary_for_month
